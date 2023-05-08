@@ -93,26 +93,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         case WM_USER + 1:
         {
             WORD cmd = LOWORD(lParam);
-            if (cmd == WM_RBUTTONUP)
+            if (cmd == WM_RBUTTONUP && hMenu == NULL)
             {
-                if (hMenu == NULL)
-                {
-                    POINT pt;
-                    GetCursorPos(&pt);
-                    hMenu = CreatePopupMenu();
-                    InsertMenu(hMenu, 0, MF_BYPOSITION | MF_STRING, IDM_EXIT, L"Exit");
-                    if (TrackPopupMenu(hMenu, TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_BOTTOMALIGN, pt.x, pt.y, 0, hWnd, NULL))
-                    {
-                        SendMessage(hWnd, WM_COMMAND, cmd, 0);
-                    }
-                }
-                else
-                {
-                    DestroyMenu(hMenu);
-                    hMenu = NULL;
-                    SendMessage(hWnd, WM_CANCELMODE, 0, 0);
-                }
+				POINT pt;
+				GetCursorPos(&pt);
+                SetForegroundWindow(hWnd);
+				hMenu = CreatePopupMenu();
+				InsertMenu(hMenu, 0, MF_BYPOSITION | MF_STRING, IDM_EXIT, L"Exit");
+				if (TrackPopupMenu(hMenu, TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_BOTTOMALIGN, pt.x, pt.y, 0, hWnd, NULL))
+				{
+					SendMessage(hWnd, WM_COMMAND, cmd, 0);
+				}
             }
+			else if (cmd != WM_MOUSEMOVE && hMenu != NULL)
+			{
+				DestroyMenu(hMenu);
+				hMenu = NULL;
+				SendMessage(hWnd, WM_CANCELMODE, 0, 0);
+			}
             break;
         }
     }
